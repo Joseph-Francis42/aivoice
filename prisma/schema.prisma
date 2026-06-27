@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String      @id @default(uuid())
+  username     String      @unique
+  passwordHash String?     // null for Guest users
+  isGuest      Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  interviews   Interview[]
+}
+
+model Interview {
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle         String
+  jobDescription   String
+  experienceLevel  String    // Junior, Mid, Senior, Lead
+  interviewType    String    // Technical, Behavioral, General
+  numberOfQuestions Int
+  personaName      String    // Sarah, Dave, Elena
+  voiceId          String
+  status           String    // 'setup' | 'completed' | 'in_progress'
+  score            Int?
+  feedbackJson     String?   // Overall summary, strengths, improvements, practice exercises (JSON string)
+  createdAt        DateTime  @default(now())
+  messages         Message[]
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  interviewId String
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  role        String    // 'interviewer' | 'candidate'
+  content     String
+  timestamp   DateTime  @default(now())
+}
