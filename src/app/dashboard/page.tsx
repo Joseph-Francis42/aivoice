@@ -171,25 +171,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Warning if API Keys are not configured */}
-          {(!hasGemini || !hasVapi) && (
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex gap-3 items-start">
-                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse mt-1.5 shrink-0" />
-                <div className="text-xs text-amber-400/80 flex flex-col gap-1">
-                  <p className="text-sm font-bold text-amber-300">API Configuration Status</p>
-                  {!hasGemini && <span>• Google Gemini API Key is missing. (AI feedback report will run in mock mode).</span>}
-                  {!hasVapi && <span>• Vapi Public Key is missing. (Using local browser speech engine fallback).</span>}
-                </div>
-              </div>
-              <button
-                onClick={() => setShowSettings(true)}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs transition-colors shrink-0"
-              >
-                Configure Keys
-              </button>
-            </div>
-          )}
+
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

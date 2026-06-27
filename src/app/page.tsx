@@ -148,17 +148,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Warning if keys are not set */}
-          {(!hasGemini || !hasVapi) && (
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 max-w-lg">
-              <ShieldAlert className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
-              <div className="text-xs text-amber-300 flex flex-col gap-1">
-                <span className="font-bold">API Configuration Status:</span>
-                {!hasGemini && <span>• Google Gemini API Key is missing. (AI feedback grading will run in mock mode).</span>}
-                {!hasVapi && <span>• Vapi Public Key is missing. (Using local browser speech engine fallback).</span>}
-              </div>
-            </div>
-          )}
+
 
           {/* Auth Card */}
           <div className="w-full max-w-md p-8 rounded-2xl glass shadow-2xl relative overflow-hidden">
