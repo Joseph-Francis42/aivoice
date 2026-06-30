@@ -33,6 +33,46 @@ function getApiKey(userApiKey?: string): string | null {
   return userApiKey || process.env.GEMINI_API_KEY || null;
 }
 
+function getFallbackQuestionsForRole(
+  jobTitle: string,
+  interviewType: string,
+  numberOfQuestions: number
+): string[] {
+  const titleLower = jobTitle.toLowerCase();
+  const typeLower = interviewType.toLowerCase();
+  
+  let pool: string[] = [];
+  if (typeLower.includes("behavioral")) {
+    pool = fallbackQuestions.behavioral;
+  } else if (
+    titleLower.includes("front") || 
+    titleLower.includes("react") || 
+    titleLower.includes("ui") || 
+    titleLower.includes("web") || 
+    titleLower.includes("js") || 
+    titleLower.includes("ts") || 
+    titleLower.includes("css")
+  ) {
+    pool = fallbackQuestions.frontend;
+  } else if (
+    titleLower.includes("back") || 
+    titleLower.includes("api") || 
+    titleLower.includes("node") || 
+    titleLower.includes("db") || 
+    titleLower.includes("cloud") || 
+    titleLower.includes("server") || 
+    titleLower.includes("devops")
+  ) {
+    pool = fallbackQuestions.backend;
+  } else {
+    pool = [...fallbackQuestions.frontend, ...fallbackQuestions.backend, ...fallbackQuestions.behavioral];
+  }
+  
+  // Shuffle and pick
+  const shuffled = [...pool].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, Math.min(numberOfQuestions, shuffled.length));
+}
+
 export async function generateQuestions(
   jobTitle: string,
   jobDescription: string,
@@ -45,25 +85,7 @@ export async function generateQuestions(
   
   if (!apiKey) {
     console.warn("No Gemini API Key found. Generating fallback questions.");
-    // Offline/Fallback mode
-    const titleLower = jobTitle.toLowerCase();
-    const typeLower = interviewType.toLowerCase();
-    
-    let pool: string[] = [];
-    if (typeLower.includes("behavioral")) {
-      pool = fallbackQuestions.behavioral;
-    } else if (titleLower.includes("front") || titleLower.includes("react") || titleLower.includes("ui") || titleLower.includes("web")) {
-      pool = fallbackQuestions.frontend;
-    } else if (titleLower.includes("back") || titleLower.includes("api") || titleLower.includes("node") || titleLower.includes("db") || titleLower.includes("cloud")) {
-      pool = fallbackQuestions.backend;
-    } else {
-      // Blend frontend, backend and behavioral
-      pool = [...fallbackQuestions.frontend, ...fallbackQuestions.backend, ...fallbackQuestions.behavioral];
-    }
-    
-    // Shuffle and pick
-    const shuffled = [...pool].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, Math.min(numberOfQuestions, shuffled.length));
+    return getFallbackQuestionsForRole(jobTitle, interviewType, numberOfQuestions);
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -105,9 +127,7 @@ export async function generateQuestions(
     throw new Error("Invalid response format from Gemini");
   } catch (error) {
     console.error("Error generating questions with Gemini:", error);
-    return Array.from({ length: numberOfQuestions }, (_, i) => 
-      `Can you describe your experience working as a ${jobTitle} at a ${experienceLevel} level (Question ${i + 1})?`
-    );
+    return getFallbackQuestionsForRole(jobTitle, interviewType, numberOfQuestions);
   }
 }
 
