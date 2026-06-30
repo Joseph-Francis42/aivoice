@@ -396,15 +396,20 @@ export default function InterviewRoomPage() {
         },
         voice: {
           provider: "playht",
-          voiceId: "josh", // Standard free built-in voice
+          voiceId: "josh",
         },
+      };
+
+      const assistantOverrides = {
+        firstMessage: assistantConfig.firstMessage,
+        model: assistantConfig.model,
       };
 
       const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
 
       try {
         if (assistantId) {
-          vapiRef.current.start(assistantId);
+          vapiRef.current.start(assistantId, assistantOverrides);
         } else {
           vapiRef.current.start(assistantConfig);
         }
